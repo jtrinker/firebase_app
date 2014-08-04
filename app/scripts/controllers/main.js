@@ -9,13 +9,18 @@ angular.module('firebaseAppApp')
     $scope.currentUser = null;
     $scope.currentText = null;
 
+    $scope.messages = [];
+
+    $scope.currentAnimal = 'Giraffe';
+
     // on() is a listener for changes to the ref
-    messagesRef.on('value', function(snapshot) {
-      // $timeout value is 0, telling angular to update
+    messagesRef.on('child_added', function(snapshot, prevChild) {
+      // $timeout value is 0, top of queue, telling angular to update
       $timeout(function() {
         var snapshotVal = snapshot.val();
-        $scope.messages = snapshotVal;
+        $scope.messages.push(snapshotVal);
       });
+      console.log("previous child: " + prevChild);
     });
 
     $scope.sendMessage = function() {
@@ -27,6 +32,13 @@ angular.module('firebaseAppApp')
       // messages node and also creates a 
       // unique name
       messagesRef.push(newMessage);
+    };
+
+    $scope.createAnimal = function() {
+    	var newAnimal = {
+    		name: $scope.currentAnimal
+    	};
+    	rootRef.child('animals').push(newAnimal);
     };
 
     // // using $watch bc {{message.text}} isn't in view
